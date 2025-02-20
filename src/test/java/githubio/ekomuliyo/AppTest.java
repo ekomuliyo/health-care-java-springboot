@@ -1,4 +1,4 @@
-package github.io.ekomuliyo;
+package githubio.ekomuliyo;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertTrue;

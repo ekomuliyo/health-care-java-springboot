@@ -8,9 +8,17 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
 @RequestMapping("/api/medication")
@@ -22,7 +30,7 @@ public class MedicationController {
 
     @Operation(
         summary = "Create a new medication",
-        description = "Creates a new medication with the provided information"
+        description = "Creates a new medication with the provided information and image"
     )
     @ApiResponses({
         @ApiResponse(
@@ -34,15 +42,87 @@ public class MedicationController {
             responseCode = "400",
             description = "Invalid input data",
             content = @Content
+        )
+    })
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(ref = "#/components/requestBodies/MedicationRequest")
+    public ResponseEntity<MedicationDto> createMedication(
+        @RequestPart(value = "image") MultipartFile image,
+        @RequestPart(value = "medication") String medicationJson
+    ) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            MedicationDto medicationDto = mapper.readValue(medicationJson, MedicationDto.class);
+            return ResponseEntity.ok(medicationService.createMedication(medicationDto, image));
+        } catch (JsonProcessingException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid medication JSON format: " + e.getMessage());
+        }
+    }
+
+    @Operation(
+        summary = "Get medication by ID",
+        description = "Retrieves a medication by its ID"
+    )
+    @ApiResponses({
+        @ApiResponse(
+            responseCode = "200",
+            description = "Medication found",
+            content = @Content(schema = @Schema(implementation = MedicationDto.class))
         ),
         @ApiResponse(
-            responseCode = "500",
-            description = "Internal server error",
+            responseCode = "404",
+            description = "Medication not found",
             content = @Content
         )
     })
-    @PostMapping
-    public ResponseEntity<MedicationDto> createMedication(@RequestBody MedicationDto medicationDto) {
-        return ResponseEntity.ok(medicationService.createMedication(medicationDto));
+    @GetMapping("/{id}")
+    public ResponseEntity<MedicationDto> getMedicationById(@PathVariable Long id) {
+        return ResponseEntity.ok(medicationService.getMedicationById(id));
+    }
+
+    @Operation(
+        summary = "Update medication",
+        description = "Updates an existing medication with new information and optional new image"
+    )
+    @ApiResponses({
+        @ApiResponse(
+            responseCode = "200",
+            description = "Medication updated successfully",
+            content = @Content(schema = @Schema(implementation = MedicationDto.class))
+        ),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Medication not found",
+            content = @Content
+        )
+    })
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<MedicationDto> updateMedication(
+        @PathVariable Long id,
+        @RequestPart(value = "image", required = false) MultipartFile image,
+        @RequestPart("medication") @Valid MedicationDto medicationDto
+    ) {
+        return ResponseEntity.ok(medicationService.updateMedication(id, medicationDto, image));
+    }
+
+    @Operation(
+        summary = "Delete medication",
+        description = "Deletes a medication by its ID"
+    )
+    @ApiResponses({
+        @ApiResponse(
+            responseCode = "204",
+            description = "Medication deleted successfully"
+        ),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Medication not found",
+            content = @Content
+        )
+    })
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteMedication(@PathVariable Long id) {
+        medicationService.deleteMedication(id);
+        return ResponseEntity.noContent().build();
     }
 }

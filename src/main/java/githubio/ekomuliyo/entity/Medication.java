@@ -33,6 +33,8 @@ public class Medication {
 
     private String manufacturer;
 
+    private String responseMessage;
+
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "medication_id")
     private List<MedicationIngredient> medicationIngredients;

@@ -40,6 +40,7 @@ public class MedicationMapper {
         dto.setDescription(entity.getDescription());
         dto.setPrice(entity.getPrice());
         dto.setManufacturer(entity.getManufacturer());
+        dto.setResponseId(entity.getResponseId().toString());
         
         if (entity.getMedicationIngredients() != null) {
             dto.setMedicationIngredients(

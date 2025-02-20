@@ -1,2 +1,3 @@
 target/
+uploads/images/
 src/main/resources/application-local.properties
