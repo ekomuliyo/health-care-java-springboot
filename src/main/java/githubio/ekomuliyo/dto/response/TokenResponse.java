@@ -1,4 +1,4 @@
-package githubio.ekomuliyo.dto;
+package githubio.ekomuliyo.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;

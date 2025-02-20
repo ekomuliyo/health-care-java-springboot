@@ -1,4 +1,4 @@
-package githubio.ekomuliyo.dto;
+package githubio.ekomuliyo.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

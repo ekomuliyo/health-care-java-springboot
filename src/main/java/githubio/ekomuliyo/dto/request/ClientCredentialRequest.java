@@ -1,10 +1,10 @@
-package githubio.ekomuliyo.dto;
+package githubio.ekomuliyo.dto.request;
 
 import feign.form.FormProperty;
 import lombok.Data;
 
 @Data
-public class ClientCredentials {
+public class ClientCredentialRequest {
     @FormProperty("client_id")
     private String clientId;
     

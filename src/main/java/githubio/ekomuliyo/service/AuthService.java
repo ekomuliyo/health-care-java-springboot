@@ -1,8 +1,8 @@
 package githubio.ekomuliyo.service;
 
 import githubio.ekomuliyo.client.AuthClient;
-import githubio.ekomuliyo.dto.ClientCredentials;
-import githubio.ekomuliyo.dto.TokenResponse;
+import githubio.ekomuliyo.dto.request.ClientCredentialRequest;
+import githubio.ekomuliyo.dto.response.TokenResponse;
 import githubio.ekomuliyo.repository.ConfigIntegrationRepository;
 import githubio.ekomuliyo.entity.ConfigIntegration;
 
@@ -26,7 +26,7 @@ public class AuthService {
             throw new RuntimeException("ConfigIntegration not found");
         }
 
-        ClientCredentials credentials = new ClientCredentials();
+        ClientCredentialRequest credentials = new ClientCredentialRequest();
         credentials.setClientId(config.getClientId());
         credentials.setClientSecret(config.getClientSecret());
 

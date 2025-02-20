@@ -1,9 +1,9 @@
 package githubio.ekomuliyo.service;
 
 import githubio.ekomuliyo.dto.MedicationDto;
-import githubio.ekomuliyo.dto.TokenResponse;
 import githubio.ekomuliyo.dto.request.FhirMedicationRequest;
 import githubio.ekomuliyo.dto.response.FhirMedicationResponse;
+import githubio.ekomuliyo.dto.response.TokenResponse;
 import githubio.ekomuliyo.mapper.MedicationMapper;
 import githubio.ekomuliyo.repository.MedicationRepository;
 import githubio.ekomuliyo.entity.Medication;
