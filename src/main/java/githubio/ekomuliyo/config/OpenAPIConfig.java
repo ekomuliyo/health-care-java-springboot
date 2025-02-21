@@ -21,11 +21,11 @@ public class OpenAPIConfig {
     @Bean
     public OpenAPI openAPI() {
         Server devServer = new Server();
-        devServer.setUrl("http://localhost:8080");
-        devServer.setDescription("Server URL in Development environment");
+        devServer.setUrl("/");
+        devServer.setDescription("Server URL");
 
         Contact contact = new Contact();
-        contact.setEmail("ekomuliyo@github.io");
+        contact.setEmail("ekomuliyo@gmail.com");
         contact.setName("Eko Muliyo");
         contact.setUrl("https://github.com/ekomuliyo");
 

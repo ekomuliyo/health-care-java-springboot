@@ -22,6 +22,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.annotations.Parameter;
 
 @RestController
 @RequestMapping("/api/medication")
@@ -79,7 +80,10 @@ public class MedicationController {
         )
     })
     @GetMapping("/{id}")
-    public ResponseEntity<MedicationDto> getMedicationById(@PathVariable Long id) {
+    public ResponseEntity<MedicationDto> getMedicationById(
+        @Parameter(description = "Medication ID", example = "1", schema = @Schema(type = "integer"))
+        @PathVariable(value = "id") Long id
+    ) {
         return ResponseEntity.ok(medicationService.getMedicationById(id));
     }
 
@@ -131,7 +135,10 @@ public class MedicationController {
         )
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteMedication(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteMedication(
+        @Parameter(description = "Medication ID", example = "1", schema = @Schema(type = "integer"))
+        @PathVariable(value = "id") Long id
+    ) {
         medicationService.deleteMedication(id);
         return ResponseEntity.noContent().build();
     }
@@ -149,10 +156,14 @@ public class MedicationController {
     })
     @GetMapping
     public ResponseEntity<Page<MedicationDto>> getAllMedications(
-        @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "10") int size,
-        @RequestParam(defaultValue = "id") String sortBy,
-        @RequestParam(defaultValue = "asc") String direction
+        @Parameter(description = "Page number (0-based)", example = "0", schema = @Schema(type = "integer"))
+        @RequestParam(value = "page", defaultValue = "0") int page,
+        @Parameter(description = "Number of items per page", example = "10", schema = @Schema(type = "integer"))
+        @RequestParam(value = "size", defaultValue = "10") int size,
+        @Parameter(description = "Field to sort by", example = "id", schema = @Schema(type = "string"))
+        @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
+        @Parameter(description = "Sort direction (asc/desc)", example = "asc", schema = @Schema(type = "string"))
+        @RequestParam(value = "direction", defaultValue = "asc") String direction
     ) {
         Sort.Direction sortDirection = direction.equalsIgnoreCase("desc") ? 
             Sort.Direction.DESC : Sort.Direction.ASC;
