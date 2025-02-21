@@ -8,8 +8,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -97,12 +100,19 @@ public class MedicationController {
         )
     })
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(ref = "#/components/requestBodies/MedicationRequest")
     public ResponseEntity<MedicationDto> updateMedication(
         @PathVariable Long id,
         @RequestPart(value = "image", required = false) MultipartFile image,
-        @RequestPart("medication") @Valid MedicationDto medicationDto
+        @RequestPart(value = "medication") String medicationJson
     ) {
-        return ResponseEntity.ok(medicationService.updateMedication(id, medicationDto, image));
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            MedicationDto medicationDto = mapper.readValue(medicationJson, MedicationDto.class);
+            return ResponseEntity.ok(medicationService.updateMedication(id, medicationDto, image));
+        } catch (JsonProcessingException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid medication JSON format: " + e.getMessage());
+        }
     }
 
     @Operation(
@@ -124,5 +134,29 @@ public class MedicationController {
     public ResponseEntity<Void> deleteMedication(@PathVariable Long id) {
         medicationService.deleteMedication(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(
+        summary = "Get all medications with pagination",
+        description = "Retrieves a paginated list of medications with optional sorting"
+    )
+    @ApiResponses({
+        @ApiResponse(
+            responseCode = "200",
+            description = "Medications retrieved successfully",
+            content = @Content(schema = @Schema(implementation = Page.class))
+        )
+    })
+    @GetMapping
+    public ResponseEntity<Page<MedicationDto>> getAllMedications(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size,
+        @RequestParam(defaultValue = "id") String sortBy,
+        @RequestParam(defaultValue = "asc") String direction
+    ) {
+        Sort.Direction sortDirection = direction.equalsIgnoreCase("desc") ? 
+            Sort.Direction.DESC : Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sortBy));
+        return ResponseEntity.ok(medicationService.getAllMedicationsWithPagination(pageable));
     }
 }

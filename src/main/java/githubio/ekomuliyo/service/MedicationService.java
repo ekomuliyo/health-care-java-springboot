@@ -19,13 +19,13 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import githubio.ekomuliyo.client.FhirClient;
-import githubio.ekomuliyo.service.AuthService;
 import java.util.UUID;
 import githubio.ekomuliyo.exception.FhirApiException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 @Validated
@@ -236,5 +236,11 @@ public class MedicationService {
     @Transactional(readOnly = true)
     public boolean existsBySku(String sku) {
         return medicationRepository.existsBySku(sku);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<MedicationDto> getAllMedicationsWithPagination(Pageable pageable) {
+        Page<Medication> medicationPage = medicationRepository.findAll(pageable);
+        return medicationPage.map(medicationMapper::toDto);
     }
 }
